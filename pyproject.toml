@@ -7,7 +7,57 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+pydantic = "^2.11.5"
+pydantic-settings = "^2.9.1"
+fastapi = "^0.115.12"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.11"
+pytest = "^8.3.5"
+uvicorn = "^0.34.2"
+pytest-cov = "^6.1.1"
+pytest-mock = "^3.14.0"
+httpx = "^0.28.1"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ['app/infra/database/alembic/*']
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "F", "W", "D", "C", "SIM", "S", "PT", "PL"]
+ignore = [
+    "PLW1514",
+    "PLR0904",
+    "D107",
+    "D104",
+    "D212",
+    "D203",
+    "PLR6301",
+    "S101",
+    "S113",
+]
+
+[tool.ruff.format]
+preview = true
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = """
+    --cov=app
+    --cov-report=term
+    --cov-report=html
+    --cov-config=.coveragerc
+    -p no:warnings
+"""
+testpaths = ["tests"]
+
+[tool.coverage.run]
+omit = ["tests/*",]
 
 [build-system]
 requires = ["poetry-core"]
