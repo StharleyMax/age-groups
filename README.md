@@ -15,7 +15,7 @@ O sistema é modular e composto por três componentes principais que interagem e
 
 Atua como um buffer entre a API de Matrículas e o Processador, garantindo a resiliência e o desacoplamento dos serviços.
 
-### Processador de Matrículas (Função Lambda - simulada via LocalStack):
+### Processador de Matrículas (Worker rodando em background escutando a fila):
 
 Consome as mensagens da fila, executa a lógica de processamento da matrícula (incluindo um tempo mínimo de processamento) e atualiza o status no banco de dados.
 
@@ -116,12 +116,52 @@ PASSWORD=admin
 make start
 ```
 
-## Testes
+## Testes e Coverage
 Para executar o teste é preciso que o ambiente de localstack esteja online
 ```bash
 # Executar Todos os Testes
 make test
 ```
+
+```
+========================================================================= tests coverage ==========================================================================
+_________________________________________________________ coverage: platform linux, python 3.12.8-final-0 _________________________________________________________
+
+Name                                                            Stmts   Miss  Cover
+-----------------------------------------------------------------------------------
+src/__init__.py                                                     0      0   100%
+src/app.py                                                          9      1    89%
+src/domains/__init__.py                                             0      0   100%
+src/domains/age_groups/__init__.py                                  0      0   100%
+src/domains/age_groups/api/__init__.py                              0      0   100%
+src/domains/age_groups/api/endpoints.py                            27      3    89%
+src/domains/age_groups/schema/__init__.py                           2      0   100%
+src/domains/age_groups/schema/age_group.py                          7      0   100%
+src/domains/enrollments/__init__.py                                 0      0   100%
+src/domains/enrollments/api/__init__.py                             0      0   100%
+src/domains/enrollments/api/endpoints.py                           40      5    88%
+src/domains/enrollments/processor.py                               13      0   100%
+src/domains/enrollments/services/__init__.py                        0      0   100%
+src/domains/enrollments/services/enrollment_service.py             28      3    89%
+src/routes.py                                                       8      0   100%
+src/shared/__init__.py                                              0      0   100%
+src/shared/auth.py                                                 10      1    90%
+src/shared/dependencies.py                                          4      0   100%
+src/shared/infra/__init__.py                                        0      0   100%
+src/shared/infra/broker/__init__.py                                 5      0   100%
+src/shared/infra/broker/base_handler.py                             9      0   100%
+src/shared/infra/broker/sqs.py                                     26      1    96%
+src/shared/infra/database/__init__.py                               0      0   100%
+src/shared/infra/database/dynamodb.py                               8      0   100%
+src/shared/infra/database/repository/__init__.py                    0      0   100%
+src/shared/infra/database/repository/age_group_repository.py       20      2    90%
+src/shared/infra/database/repository/enrollment_repository.py      17      2    88%
+src/shared/singleton.py                                             7      0   100%
+-----------------------------------------------------------------------------------
+TOTAL                                                             240     18    92%
+Coverage HTML written to dir htmlcov
+```
+
 
 ## Autenticação
 
