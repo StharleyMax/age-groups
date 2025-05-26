@@ -1,3 +1,4 @@
+import threading
 import time
 
 import pytest
@@ -8,6 +9,8 @@ import processor
 
 
 class TestEnrollmentProcessor:
+    """Test suite for the enrollment processor."""
+
     @pytest.fixture
     def enrollment(self) -> dict:
         """Fixture to provide enrollment data."""
@@ -21,7 +24,7 @@ class TestEnrollmentProcessor:
     @pytest.fixture(autouse=True)
     def processor(self):
         """Fixture to mock the enrollment processor."""
-        processor.main()
+        threading.Thread(target=processor.main, daemon=True).start()
 
     def test_process_enrollment(self, new_enrollment: Response, client: TestClient):
         """Test the enrollment processor."""

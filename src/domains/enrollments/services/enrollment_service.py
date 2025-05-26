@@ -1,5 +1,6 @@
 """Enrollment service."""
 
+import logging
 import random
 
 from src.shared.infra.broker import MessageBroker
@@ -9,6 +10,8 @@ from src.shared.infra.database.repository.enrollment_repository import Enrollmen
 
 class EnrollmentService:
     """Service for enrollment business logic."""
+
+    logger = logging.getLogger(__name__)
 
     enrollment_repo = EnrollmentRepository()
     age_group_repo = AgeGroupRepository()
@@ -39,7 +42,13 @@ class EnrollmentService:
         :param enrollment_data: Data containing enrollment information.
         """
         status = random.choice(["processed", "failed"])
-        return self.enrollment_repo.status_update(enrollment_data["cpf"], status)
+        process = self.enrollment_repo.status_update(enrollment_data["cpf"], status)
+        self.logger.info(
+            "Enrollment for cpf %s processed with status %s",
+            enrollment_data["cpf"],
+            status,
+        )
+        return process
 
     def get(self, key: dict):
         """Get an enrollment by key."""

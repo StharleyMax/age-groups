@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    env_file: .env
+    ports:
+      - "8010:8010"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    environment:
+      - AWS_ENDPOINT=http://localstack:4566
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - localstack-net
+
+  worker:
+    build: .
+    env_file: .env
+    depends_on:
+      localstack:
+        condition: service_healthy
+    command: ["python", "-u", "-m", "processor"]
+    environment:
+      - AWS_ENDPOINT=http://localstack:4566
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - localstack-net
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"
+      - "8088:8080"
+    environment:
+      - SERVICES=dynamodb,sqs
+      - DEBUG=1
+      - LOCALSTACK_UI=1
+      - PERSISTENCE=1
+      - EDGE_PORT=4566
+      - LOCALSTACK_HOST=localstack
+      - LOCALSTACK_INIT_SCRIPTS_PATH=/etc/localstack/init/ready.d
+    volumes:
+      - ./infra/localstack:/etc/localstack/init/ready.d
+      - /var/run/docker.sock:/var/run/docker.sock
+      - localstack_data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+    networks:
+      - localstack-net
+
+volumes:
+  localstack_data:
+
+networks:
+  localstack-net:
+    driver: bridge

@@ -73,3 +73,7 @@ if ! table_exists "Enrollments"; then
 else
     echo "Tabela Enrollments já existe - pulando criação"
 fi
+
+
+echo "Criando filas no SQS..."
+awslocal sqs create-queue --queue-name enrollment-queue
